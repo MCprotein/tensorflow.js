@@ -63,6 +63,8 @@ async function predictImageColor(url: string) {
   // 이미지 데이터 로드
   const imageData = await getImageData(url)
 
+  console.log(imageData, 'imageData')
+
   // 이미지 텐서 생성
   const imageTensor = tf.node.decodeImage(imageData)
 
