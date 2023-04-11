@@ -23,47 +23,9 @@ async function getImageData(url: string) {
   return imageData
 }
 
-// 이미지 색상 추론
-// async function predictImageColor(url: string) {
-//   // 이미지 데이터 로드
-//   const imageData = await getImageData(url)
-
-//   // 이미지 텐서 생성
-//   const imageTensor = tf.node.decodeImage(imageData)
-
-//   // 이미지 크기 변경 및 텐서 모양 변환
-//   const resizedImage = tf.image.resizeBilinear(imageTensor, [224, 224])
-//   const batchedImage = resizedImage.expandDims(0)
-
-//   // 모델에 이미지 전달 및 예측
-//   const predictions = await model.predict(batchedImage).data()
-
-//   // 가장 높은 확률의 색상 인덱스 찾기
-//   const topPredictionIndex = predictions.indexOf(Math.max(...predictions))
-
-//   // 색상 레이블 반환
-//   const colorLabels = [
-//     '검정',
-//     '파랑',
-//     '갈색',
-//     '녹색',
-//     '회색',
-//     '주황',
-//     '분홍',
-//     '보라',
-//     '빨강',
-//     '흰색',
-//     '노랑'
-//   ]
-//   const predictedColor = colorLabels[topPredictionIndex]
-
-//   return predictedColor
-// }
 async function predictImageColor(url: string) {
   // 이미지 데이터 로드
   const imageData = await getImageData(url)
-
-  console.log(imageData, 'imageData')
 
   // 이미지 텐서 생성
   const imageTensor = tf.node.decodeImage(imageData)
@@ -76,38 +38,29 @@ async function predictImageColor(url: string) {
   // console.log(model)
   const predictions = (await model.classify(batchedImage)) as any[]
 
-  console.log(predictions)
-  // 가장 높은 확률의 색상 인덱스 찾기
-  const topPredictionIndex = predictions[0].class
+  // 가장 높은 확률의 이미지 분류 결과 찾기
+  const classifiedResult = predictions[0].className
 
-  // 색상 레이블 반환
-  const colorLabels = [
-    '검정',
-    '파랑',
-    '갈색',
-    '녹색',
-    '회색',
-    '주황',
-    '분홍',
-    '보라',
-    '빨강',
-    '흰색',
-    '노랑'
-  ]
-  const predictedColor = colorLabels[topPredictionIndex]
-
-  return predictedColor
+  return classifiedResult
 }
 
 app.use(express.json())
 
 app.post('/predict', async (req, res) => {
   const { url } = req.body
-  const color = await predictImageColor(url)
-  res.json({ color })
+  const result = await predictImageColor(url)
+  res.json({ result })
 })
 
 app.listen(port, async () => {
   await loadModel()
   console.log(`서버가 http://localhost:${port} 에서 시작되었습니다.`)
 })
+
+/**
+ * [
+  { className: 'cloak', probability: 0.41033628582954407 }, // 망토
+  { className: 'vestment', probability: 0.2599150538444519 }, // 종교 예복
+  { className: 'velvet', probability: 0.10584428161382675 }
+]
+ */
