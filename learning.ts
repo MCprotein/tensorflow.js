@@ -65,8 +65,13 @@ function loadDataset() {
 
 async function trainModel() {
   // 모델 로드
-  const modelUrl = 'https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5'
-  const model = await tf.loadLayersModel(modelUrl)
+  // const modelUrl = 'https://tfhub.dev/google/imagenet/mobilenet_v2_100_224/classification/5'
+  // const model = await tf.loadLayersModel(modelUrl)
+
+  // const model = await mobilenet.load({ version: 2, alpha: 1 });
+
+  const mobilenetModel = await mobilenet.load({ version: 2, alpha: 1 })
+  const model = mobilenetModel
 
   // 데이터셋 로드
   const dataset = loadDataset()
